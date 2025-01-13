@@ -54,6 +54,7 @@ php artisan vendor:publish  --provider="Hamoi1\\EloquentEncryptAble\\EloquentEnc
 
 ### 3. Configure the key matrix
 in `.env` file you can configure the key matrix for encryption and decryption, by adding the following lines:
+
 ```env
 # for 2x2 matrix
 ELOQUENT_ENCRYPTABLE_KEY= "[[4, 7], [3, 10]]"
@@ -74,7 +75,9 @@ $cipher = new EloquentEncryptAbleService();
 $encrypted = $cipher->encrypt('Hello, World!');
 $decrypted = $cipher->decrypt($encrypted);
 ```
+
 output of the above code will be:
+
 ```php
 $encrypted ='"Ejrno, Wtenl!";
 $decrypted = 'Hello, World!';
@@ -109,6 +112,7 @@ the `name` and `email` fields will be encrypted in the database, and decrypted w
 
 ### 6. Re-encrypt model data
 You can re-encrypt model data with a new key matrix , but you should specify the previous key matrix in the `.env` file.
+
 ```env
 # for 2x2 key matrix
 ELOQUENT_ENCRYPTABLE_KEY= "[[4, 7], [3, 10]]"
@@ -116,7 +120,7 @@ ELOQUENT_ENCRYPTABLE_KEY= "[[4, 7], [3, 10]]"
 # for 3x3 key matrix
 ELOQUENT_ENCRYPTABLE_KEY= "[[1, 11,6], [21, 20,15] ,[2, 20, 9]]"
 ```
-```
+
 and added models that you want to re-encrypt in the `config/eloquent-encryptable.php` file:
 ```php
 'models' => [
