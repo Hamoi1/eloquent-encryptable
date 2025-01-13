@@ -18,7 +18,7 @@ class EloquentEncryptAbleServiceProvider extends ServiceProvider
         ]);
 
         // Merge the config file
-        $this->mergeConfigFrom(__DIR__ . '/../config/hill-cipher.php', 'hill-cipher');
+        $this->mergeConfigFrom(__DIR__ . '/../config/eloquent-encryptable.php', 'eloquent-encryptable.php');
 
         // Register the service
         $this->app->singleton(EloquentEncryptAbleService::class, function ($app) {
@@ -28,9 +28,9 @@ class EloquentEncryptAbleServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        // Publish the config file (hill-cipher.php)
+        // Publish the config file (eloquent-encryptable.php)
         $this->publishes([
-            __DIR__ . '/../config/hill-cipher.php' => config_path('hill-cipher.php'),
+            __DIR__ . '/../config/eloquent-encryptable.php' => config_path('eloquent-encryptable.php'),
         ], 'config');
     }
 }
