@@ -18,7 +18,7 @@ class EloquentEncryptAbleServiceProvider extends ServiceProvider
         ]);
 
         // Merge the config file
-        $this->mergeConfigFrom(__DIR__ . '/../config/eloquent-encryptable.php', 'eloquent-encryptable.php');
+        $this->mergeConfigFrom(__DIR__ . '/../config/eloquent-encryptable.php', 'eloquent-encryptable');
 
         // Register the service
         $this->app->singleton(EloquentEncryptAbleService::class, function ($app) {
