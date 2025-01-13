@@ -155,7 +155,7 @@ class EloquentEncryptAbleService
     private function getKeyMatrix(bool $previousKey = false): array
     {
         // Retrieve the key from the .env file and convert it into an array
-        $keyString = $previousKey ? config('hill-cipher.previous_key') : config('hill-cipher.key');
+        $keyString = $previousKey ? config('eloquent-encryptable.previous_key') : config('eloquent-encryptable.key');
 
         $keyMatrix = json_decode($keyString, true);
 
