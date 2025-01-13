@@ -1,0 +1,47 @@
+{
+    "name": "hamoi1/eloquent-encryptable",
+    "description": "This package provides a way to encrypt and decrypt the data in the database using the Hill Cipher algorithm.",
+    "version": "0.1",
+    "license": "MIT",
+    "keywords": [
+        "Eloquent encryptable",
+        "Eloquent",
+        "encryptable",
+        "laravel",
+        "hill cipher php",
+        "hill cipher laravel",
+        "cipher",
+        "encryption",
+        "decryption"
+    ],
+    "authors": [
+        {
+            "name": "Muhammad Esmael",
+            "email": "ihama9728@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "laravel/framework": "^11.0"
+    },
+    "suggest": {
+        "laravel/framework": "Required for Laravel 11 support (^11.0)"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hamoi1\\EloquentEncryptAble\\": "src/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Hamoi1\\EloquentEncryptAble\\EloquentEncryptAbleServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
