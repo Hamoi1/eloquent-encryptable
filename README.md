@@ -1,7 +1,7 @@
-# Elequent Encryptable 
+# Eloquent Encryptable 
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/hamoi1/elequent-encryptable.svg?style=flat-square)](https://packagist.org/packages/hamoi1/elequent-encryptable)
-[![Total Downloads](https://img.shields.io/packagist/dt/hamoi1/elequent-encryptable.svg?style=flat-square)](https://packagist.org/packages/hamoi1/elequent-encryptable)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/hamoi1/eloquent-encryptable.svg?style=flat-square)](https://packagist.org/packages/hamoi1/eloquent-encryptable)
+[![Total Downloads](https://img.shields.io/packagist/dt/hamoi1/eloquent-encryptable.svg?style=flat-square)](https://packagist.org/packages/hamoi1/eloquent-encryptable)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
 
 This package allows you to encrypt and decrypt model fields using the Hill Cipher algorithm in your Laravel application.
@@ -41,7 +41,7 @@ This package allows you to encrypt and decrypt model fields using the Hill Ciphe
 ## Installation
 ### 1. Install the package
 
-You can install the `elequent-encryptable` package via composer:
+You can install the `eloquent-encryptable` package via composer:
 ```bash
 composer require hamoi1/eloquent-encryptable
 ```
