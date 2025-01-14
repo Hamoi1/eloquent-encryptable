@@ -17,6 +17,9 @@ This package allows you to encrypt and decrypt model fields using the Hill Ciphe
   - [4. Use the Hill Cipher service](#4-use-the-hill-cipher-service)
   - [5. Encrypt and decrypt model fields](#5-encrypt-and-decrypt-model-fields)
   - [6. Re-encrypt model data](#6-re-encrypt-model-data)
+  - [7. Custom Validation Rules](#7-custom-validation-rules)
+    - [Unique Rule](#unique-rule)
+    - [Exists Rule](#exists-rule)
 
 ## Features
 - Encrypts and decrypts model fields using the Hill Cipher algorithm.
@@ -133,6 +136,51 @@ then you can run the following command to re-encrypt model data:
 php artisan eloquent-encryptable:re-encrypt
 ```
 This command will re-encrypt all model fields that are encrypted with the previous key matrix will be re-encrypted with the new key matrix.
+
+### 7. Custom Validation Rules
+#### Unique Rule
+You can use the `unique` validation rule with encrypted fields by using the `EncryptAbleUniqueRule` rule.
+```php
+use Hamoi1\EloquentEncryptAble\Rules\EncryptAbleUniqueRule;
+
+$request->validate([
+    'email' => ['required', new EncryptAbleUniqueRule('users', 'email')],
+]);
+```
+and you can add 3rd parameter to expect a specific value:
+```php
+use Hamoi1\EloquentEncryptAble\Rules\EncryptAbleUniqueRule;
+
+$request->validate([
+    'email' => ['required', new EncryptAbleUniqueRule('users', 'email',[
+        'column' => 'id',
+        'value' => $this->user_id
+    ])],
+]);
+```
+
+#### Exists Rule
+You can use the `exists` validation rule with encrypted fields by using the `EncryptAbleExistsRule` rule.
+```php
+use Hamoi1\EloquentEncryptAble\Rules\EncryptAbleExistsRule;
+
+$request->validate([
+    'email' => ['required', new EncryptAbleExistsRule('users', 'email')],
+]);
+```
+and you can add 3rd parameter to expect a specific value:
+```php
+use Hamoi1\EloquentEncryptAble\Rules\EncryptAbleExistsRule;
+
+$request->validate([
+    'email' => ['required', new EncryptAbleExistsRule('users', 'email',[
+        'column' => 'id',
+        'value' => $this->user_id
+    ])],
+]);
+```
+
+
 ## Security
 
 If you discover any security-related issues, please email [ihama9728@gmail.com](mailto:ihama9728@gmail.com) instead of using the issue tracker.
