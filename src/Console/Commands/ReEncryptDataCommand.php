@@ -31,7 +31,7 @@ class ReEncryptDataCommand extends Command
      */
     public function handle()
     {
-        $models = config('hill-cipher.models', []);
+        $models = config('eloquent-encryptable.models');
         if (empty($models)) {
             $this->error('No models found in the configuration file');
 
