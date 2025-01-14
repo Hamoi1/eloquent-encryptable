@@ -1,7 +1,6 @@
 {
     "name": "hamoi1/eloquent-encryptable",
     "description": "This package provides a way to encrypt and decrypt the data in the database using the Hill Cipher algorithm.",
-    "version": "0.1",
     "license": "MIT",
     "keywords": [
         "Eloquent encryptable",
