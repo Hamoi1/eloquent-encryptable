@@ -20,7 +20,7 @@ class EloquentEncryptAbleService
      */
     private function getSize(): int
     {
-        return strlen(self::ALPHABET);
+        return mb_strlen(self::ALPHABET, 'UTF-8');
     }
 
     /**
@@ -31,7 +31,7 @@ class EloquentEncryptAbleService
      */
     private function charToNumber(string $letter): int
     {
-        return strpos(self::ALPHABET, $letter);
+        return array_search($letter, mb_str_split(self::ALPHABET), true);
     }
 
     /**
@@ -42,7 +42,7 @@ class EloquentEncryptAbleService
      */
     private function numberToChar(int $number): string
     {
-        return self::ALPHABET[$number];
+        return array_values(mb_str_split(self::ALPHABET))[$number];
     }
 
     /**
@@ -162,15 +162,16 @@ class EloquentEncryptAbleService
         if (count($keyMatrix) != count($keyMatrix[0]) || json_last_error() !== JSON_ERROR_NONE || ! is_array($keyMatrix) || count($keyMatrix) < 2 || count($keyMatrix) > 3) {
             throw new InvalidArgumentException('Invalid Hill cipher key matrix in .env file.');
         }
-        if (!$this->isKeyMatrixInvertible($keyMatrix)) {
+        if (! $this->isKeyMatrixInvertible($keyMatrix)) {
             // tell the user key matrix is invertible and give random key matrix are not invertible
             $keyMatrix = $this->generateRandomInvertibleKeyMatrix(count($keyMatrix));
 
             throw new InvalidArgumentException(
-                'Invalid Hill cipher key matrix in .env file.' . PHP_EOL . 'The key matrix is not invertible. A random invertible key matrix has been generated.'
-                    . PHP_EOL . 'Please update the key matrix in the .env file with the following:' . PHP_EOL . json_encode($keyMatrix)
+                'Invalid Hill cipher key matrix in .env file.'.PHP_EOL.'The key matrix is not invertible. A random invertible key matrix has been generated.'
+                    .PHP_EOL.'Please update the key matrix in the .env file with the following:'.PHP_EOL.json_encode($keyMatrix)
             );
         }
+
         return $keyMatrix;
     }
 
@@ -207,6 +208,7 @@ class EloquentEncryptAbleService
     private function isKeyMatrixInvertible(array $keyMatrix): bool
     {
         $determinant = $this->determinantMatrix($keyMatrix);
+
         return $this->gcd($determinant, self::getSize()) == 1;
     }
 
@@ -221,6 +223,28 @@ class EloquentEncryptAbleService
     {
         return $b == 0 ? $a : $this->gcd($b, $a % $b);
     }
+
+    /**
+     * Checks if a character is a letter or a special character.
+     *
+     * @param  string  $char  The character to check.
+     * @return bool Whether the character is a letter or a special character.
+     */
+    private function isSpaceOrSpecialCharacter(string $char): bool
+    {
+        return preg_match('/[\s\d'.preg_quote(self::SPECIAL_CHARACTERS, '/').']/u', $char);
+    }
+
+    /**
+     * Returns a dummy character.
+     *
+     * @return string The dummy character.
+     */
+    private function getDummyCharacter(): string
+    {
+        return '_';
+    }
+
     /**
      * Encrypts a word using the Hill cipher algorithm and the provided key matrix.
      *
@@ -233,34 +257,43 @@ class EloquentEncryptAbleService
      */
     public function encrypt(string $word): string
     {
+        $word = trim($word); // remove leading and trailing spaces
         $keyMatrix = $this->getKeyMatrix();
         $encryptedWord = '';
 
         // Add a dummy character to the end of the text if it has an odd number of characters
-        while (strlen($word) % count($keyMatrix) != 0) {
-            $word .= 'X'; // 'X' is the dummy character
+        while (mb_strlen($word) % count($keyMatrix) != 0) {
+            $word .= $this->getDummyCharacter();
         }
-        for ($i = 0; $i < strlen($word); $i += count($keyMatrix)) {
-            $chars = array_slice(str_split($word, 1), $i, count($keyMatrix));
-            $checkSpecialCharacters = array_map(function ($char) {
-                return preg_match('/[\s\d' . preg_quote(self::SPECIAL_CHARACTERS, '/') . ']/u', $char);
+        // Split the word into blocks of by the size of the key matrix 2x2 or 3x3
+        foreach (mb_str_split($word, count($keyMatrix)) as $chars) {
+            $chars = mb_str_split($chars); // convert to array
+            // check the characters are spaces or numbers
+            $checkSpecialCharactersOrSpace = array_map(function ($char) {
+                return $this->isSpaceOrSpecialCharacter($char);
             }, $chars);
             // If the characters are spaces or numbers, add them directly to the encrypted word
-            if (in_array(1, $checkSpecialCharacters)) {
+            if (in_array(1, $checkSpecialCharactersOrSpace)) {
                 $encryptedWord .= implode('', $chars);
             } else {
                 // Determine if the characters are uppercase or lowercase
                 $isUpperCase = array_map('ctype_upper', $chars);
                 $vector = array_map(function ($char) {
-                    return $this->charToNumber(strtoupper($char));
+                    return $this->charToNumber(mb_strtoupper($char)); // convert to uppercase
                 }, $chars);
+                // Encrypt the vector using the key matrix
                 $encryptedVector = $this->vectorMatrixMultiplication($keyMatrix, $vector);
                 foreach ($encryptedVector as $index => $num) {
                     $encryptedChar = $this->numberToChar($num);
                     // Convert back to original case
-                    $encryptedWord .= $isUpperCase[$index] ? strtoupper($encryptedChar) : strtolower($encryptedChar);
+                    $encryptedWord .= $isUpperCase[$index] ? mb_strtoupper($encryptedChar) : mb_strtolower($encryptedChar);
                 }
             }
+        }
+
+        // remove the dummy character from the end of the encrypted word
+        while (mb_substr($encryptedWord, -1) === $this->getDummyCharacter()) {
+            $encryptedWord = mb_substr($encryptedWord, 0, -1);
         }
 
         return $encryptedWord;
@@ -283,35 +316,36 @@ class EloquentEncryptAbleService
         $decryptedWord = '';
 
         // Add a dummy character to the end of the text if it has an odd number of characters
-        while (strlen($encryptedWord) % count($keyMatrix) != 0) {
-            $encryptedWord .= 'X'; // 'X' is the dummy character
+        while (mb_strlen($encryptedWord) % count($keyMatrix) != 0) {
+            $encryptedWord .= $this->getDummyCharacter();
         }
 
-        for ($i = 0; $i < strlen($encryptedWord); $i += count($keyMatrix)) {
-            $chars = array_slice(str_split($encryptedWord, 1), $i, count($keyMatrix));
-            // If the characters are spaces or numbers, add them directly to the decrypted word
+        foreach (mb_str_split($encryptedWord, count($keyMatrix)) as $chars) {
+            $chars = mb_str_split($chars); // convert to array
             $checkSpecialCharacters = array_map(function ($char) {
-                return preg_match('/[\s\d' . preg_quote(self::SPECIAL_CHARACTERS, '/') . ']/u', $char);
+                return $this->isSpaceOrSpecialCharacter($char);
             }, $chars);
+            // If the characters are spaces or numbers, add them directly to the decrypted word
             if (in_array(1, $checkSpecialCharacters)) {
                 $decryptedWord .= implode('', $chars);
             } else {
                 // Determine if the characters are uppercase or lowercase
                 $isUpperCase = array_map('ctype_upper', $chars);
-
                 $vector = array_map(function ($char) {
-                    return $this->charToNumber(strtoupper($char));
+                    return $this->charToNumber(mb_strtoupper($char)); // convert to uppercase
                 }, $chars);
+                // Decrypt the vector using the key matrix and convert back to original case
                 $decryptedVector = $this->vectorMatrixMultiplication($this->inverseMatrix($keyMatrix), $vector);
                 foreach ($decryptedVector as $index => $num) {
                     $decryptedChar = $this->numberToChar($num);
-                    $decryptedWord .= $isUpperCase[$index] ? strtoupper($decryptedChar) : strtolower($decryptedChar);
+                    $decryptedWord .= $isUpperCase[$index] ? mb_strtoupper($decryptedChar) : mb_strtolower($decryptedChar);
                 }
             }
         }
 
-        while (substr($decryptedWord, -1) === 'X') {
-            $decryptedWord = substr($decryptedWord, 0, -1);
+        // remove the dummy character from the end of the decrypted word
+        while (mb_substr($decryptedWord, -1) === $this->getDummyCharacter()) {
+            $decryptedWord = mb_substr($decryptedWord, 0, -1);
         }
 
         return $decryptedWord;
