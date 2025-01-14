@@ -29,13 +29,13 @@ This package allows you to encrypt and decrypt model fields using the Hill Ciphe
 - Supports 2x2 and 3x3 key matrices.
 
 ## Matrix Key Support
+- [✅] 2x2 matrix
+- [✅] 3x3 matrix
+- [❌] 4x4 matrix
+- [❌] 5x5 matrix
 
-| Matrix Size    | Status       | Notes                  |
-|--------------------|----------------------|------------------------|
-| 2x2            | ✅ Supported | Fully functional.      |
-| 3x3            | ✅ Supported | Fully functional.      |
 
-# Language Support
+## Language Support
 - [✅] English
 - [✅] Kurdish (Sorani) 
 - [✅] Arabic
