@@ -34,8 +34,8 @@ This package allows you to encrypt and decrypt model fields using the Hill Ciphe
 
 # Language Support
 - [✅] English
-- [x] Kurdish (Sorani) 
-- [x] Arabic
+- [✅] Kurdish (Sorani) 
+- [✅] Arabic
 
 
 ## Installation
