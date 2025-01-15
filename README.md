@@ -20,6 +20,7 @@ This package allows you to encrypt and decrypt model fields using the Hill Ciphe
   - [7. Custom Validation Rules](#7-custom-validation-rules)
     - [Unique Rule](#unique-rule)
     - [Exists Rule](#exists-rule)
+   - [8 . Blade Directives](#8-blade-directives)
 
 ## Features
 - Encrypts and decrypts model fields using the Hill Cipher algorithm.
@@ -178,6 +179,13 @@ $request->validate([
         'value' => $this->user_id
     ])],
 ]);
+```
+
+### 8. Blade Directives
+You can use the `@encrypt` and `@decrypt` blade directives to encrypt and decrypt text in your blade views.
+```blade
+@encrypt('Hello, World!')
+@decrypt('Ejrno, Wtenl!')
 ```
 
 
