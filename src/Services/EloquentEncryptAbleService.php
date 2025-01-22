@@ -23,6 +23,11 @@ class EloquentEncryptAbleService
      */
     private const SPECIAL_CHARACTERS = "!@#$%^&*()_+-=[]{}|;':,.<>?/`~";
 
+    private static $alphabetSizes = [
+        "en" => 52,
+        "ckb_and_ar" => 44,
+    ];
+
     /**
      * Returns the size of the alphabet for the specified language.
      * 
@@ -30,7 +35,7 @@ class EloquentEncryptAbleService
      */
     private function getSize(string $lang = 'en'): int
     {
-        return mb_strlen(self::ALPHABET[$lang], 'UTF-8');
+        return self::$alphabetSizes[$lang];
     }
 
     /**
@@ -41,11 +46,7 @@ class EloquentEncryptAbleService
      */
     private function getLanguageOfChar(string $char): string
     {
-        if (preg_match('/[a-zA-Z]/', $char)) {
-            return 'en';
-        } else {
-            return 'ckb_and_ar';
-        }
+        return ctype_alpha($char) ? 'en' : 'ckb_and_ar';
     }
 
     /**
@@ -57,7 +58,7 @@ class EloquentEncryptAbleService
      */
     private function charToNumber(string $letter, string $lang = 'en'): int
     {
-        return array_search($letter, mb_str_split(self::ALPHABET[$lang]), true);
+        return mb_strpos(self::ALPHABET[$lang], mb_strtoupper($letter));
     }
 
     /**
@@ -69,7 +70,7 @@ class EloquentEncryptAbleService
      */
     private function numberToChar(int $number, string $lang = 'en'): string
     {
-        return array_values(mb_str_split(self::ALPHABET[$lang]))[$number];
+        return mb_substr(self::ALPHABET[$lang], $number, 1);
     }
 
     /**
