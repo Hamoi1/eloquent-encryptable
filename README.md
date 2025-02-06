@@ -62,11 +62,9 @@ in `.env` file you can configure the key matrix for encryption and decryption, b
 ```env
 # for 2x2 matrix
 ELOQUENT_ENCRYPTABLE_KEY= "[[4, 7], [3, 10]]"
-ELOQUENT_ENCRYPTABLE_PREVIOUS_KEY= "[[14, 17], [13, 20]]"
 
 # for 3x3 matrix
 ELOQUENT_ENCRYPTABLE_KEY= "[[1, 11,6], [21, 20,15] ,[2, 20, 9]]"
-ELOQUENT_ENCRYPTABLE_PREVIOUS_KEY= "[[13,5,14],[7,10,1],[4,3,16]]"
 ```
 now the key matrix should be a 2x2 matrix, and the previous key matrix is used to re-encrypt model data with a new key matrix.
 
@@ -120,9 +118,11 @@ You can re-encrypt model data with a new key matrix , but you should specify the
 ```env
 # for 2x2 key matrix
 ELOQUENT_ENCRYPTABLE_KEY= "[[4, 7], [3, 10]]"
+ELOQUENT_ENCRYPTABLE_PREVIOUS_KEY= "[[14, 17], [13, 20]]"
 
-# for 3x3 key matrix
+# for 3x3 matrix
 ELOQUENT_ENCRYPTABLE_KEY= "[[1, 11,6], [21, 20,15] ,[2, 20, 9]]"
+ELOQUENT_ENCRYPTABLE_PREVIOUS_KEY= "[[13,5,14],[7,10,1],[4,3,16]]"
 ```
 
 and added models that you want to re-encrypt in the `config/eloquent-encryptable.php` file:
