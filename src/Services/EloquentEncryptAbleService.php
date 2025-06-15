@@ -13,7 +13,7 @@ class EloquentEncryptAbleService
      */
     private const ALPHABET = [
         'en' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-        'ckb_and_ar' => 'ڤابتثجحخدذرزسشصضطظعغفقكلمنهويکچڕگۆێەڵئءآأإةؤی',
+        'ckb_and_ar' => 'ابتثجحخدذرزسشصضطظعغفقكلمنهويکچڕگۆێەڵئءآأإةؤی',
     ];
 
     /**
