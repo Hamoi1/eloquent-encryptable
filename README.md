@@ -1,198 +1,485 @@
-# Eloquent Encryptable 
+# 🔐 Eloquent Encryptable
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/hamoi1/eloquent-encryptable.svg?style=flat-square)](https://packagist.org/packages/hamoi1/eloquent-encryptable)
-[![Total Downloads](https://img.shields.io/packagist/dt/hamoi1/eloquent-encryptable.svg?style=flat-square)](https://packagist.org/packages/hamoi1/eloquent-encryptable)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
+<p align="center">
+  <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
+  <img src="https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
+  <img src="https://img.shields.io/badge/Encryption-Hill_Cipher-blue?style=for-the-badge" alt="Hill Cipher">
+</p>
 
-This package allows you to encrypt and decrypt model fields using the Hill Cipher algorithm in your Laravel application.
+<p align="center">
+  <strong>A powerful Laravel package for encrypting Eloquent model attributes using the Hill Cipher algorithm with multi-language support.</strong>
+</p>
 
-## Table of Contents
-- [Features](#features)
-- [Matrix Key Support](#matrix-key-support)
-- [Language Support](#language-support)
-- [Installation](#installation)
-  - [1. Install the package](#1-install-the-package)
-  - [2. Publish the configuration file](#2-publish-the-configuration-file)
-  - [3. Configure the key matrix](#3-configure-the-key-matrix)
-  - [4. Use the Hill Cipher service](#4-use-the-hill-cipher-service)
-  - [5. Encrypt and decrypt model fields](#5-encrypt-and-decrypt-model-fields)
-  - [6. Re-encrypt model data](#6-re-encrypt-model-data)
-  - [7. Custom Validation Rules](#7-custom-validation-rules)
-    - [Unique Rule](#unique-rule)
-    - [Exists Rule](#exists-rule)
-   - [8 . Blade Directives](#8-blade-directives)
+<p align="center">
+  <img src="https://img.shields.io/github/license/hamoi1/eloquent-encryptable?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/version-0.1.4-brightgreen?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/Laravel-11%2B-orange?style=flat-square" alt="Laravel Version">
+</p>
 
-## Features
-- Encrypts and decrypts model fields using the Hill Cipher algorithm.
-- Supports re-encryption of model data with a new key matrix.
-- Handles uppercase and lowercase letters, spaces, and numbers.
-- encrypt and decrypt text using the Hill Cipher algorithm.
-- Supports 2x2 and 3x3 key matrices.
+---
 
-## Matrix Key Support
-- [✅] 2x2 matrix
-- [✅] 3x3 matrix
-- [❌] 4x4 matrix
-- [❌] 5x5 matrix
+## ✨ Features
 
+- 🔒 **Hill Cipher Encryption**: Advanced matrix-based encryption algorithm
+- 🌐 **Multi-language Support**: English, Kurdish, and Arabic character sets
+- 🚀 **Automatic Encryption/Decryption**: Seamless model attribute handling
+- ✅ **Validation Rules**: Built-in unique and exists validation for encrypted fields
+- 🎨 **Blade Directives**: Easy encryption/decryption in views
+- 🔄 **Key Rotation**: Re-encrypt data with new keys using console commands
+- ⚡ **Performance Optimized**: Chunked processing for large datasets
 
-## Language Support
-- [✅] English
-- [✅] Kurdish (Sorani) 
-- [✅] Arabic
+---
 
+## 📋 Table of Contents
 
-## Installation
-### 1. Install the package
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Usage](#-usage)
+  - [Basic Usage](#basic-usage)
+  - [Validation Rules](#validation-rules)
+  - [Blade Directives](#blade-directives)
+  - [Console Commands](#console-commands)
+- [Advanced Usage](#-advanced-usage)
+- [API Reference](#-api-reference)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-You can install the `eloquent-encryptable` package via composer:
+---
+
+## 🚀 Installation
+
+Install the package via Composer:
+
 ```bash
 composer require hamoi1/eloquent-encryptable
 ```
 
-### 2. Publish the configuration file
-you can publish the configuration file to change the key matrix for encryption and decryption, and assign models to re-encrypt by running the following command:
+Publish the configuration file:
+
 ```bash
-php artisan vendor:publish  --provider="Hamoi1\\EloquentEncryptAble\\EloquentEncryptAbleServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Hamoi1\EloquentEncryptAble\EloquentEncryptAbleServiceProvider" --tag="config"
 ```
 
-### 3. Configure the key matrix
-in `.env` file you can configure the key matrix for encryption and decryption, by adding the following lines:
+---
 
-```env
-# for 2x2 matrix
-ELOQUENT_ENCRYPTABLE_KEY= "[[4, 7], [3, 10]]"
+## ⚙️ Configuration
 
-# for 3x3 matrix
-ELOQUENT_ENCRYPTABLE_KEY= "[[1, 11,6], [21, 20,15] ,[2, 20, 9]]"
-```
-now the key matrix should be a 2x2 matrix, and the previous key matrix is used to re-encrypt model data with a new key matrix.
-
-### 4. Use for text encryption and decryption
-You can use the `EloquentEncryptAbleService` service to encrypt and decrypt text using the Hill Cipher algorithm.
-```php
-use Hamoi1\EloquentEncryptAble\Services\EloquentEncryptAbleService;
-
-$cipher = new EloquentEncryptAbleService();
-$encrypted = $cipher->encrypt('Hello, World!');
-$decrypted = $cipher->decrypt($encrypted);
-```
-
-output of the above code will be:
+After publishing, configure your encryption settings in `config/eloquent-encryptable.php`:
 
 ```php
-$encrypted ='"Ejrno, Wtenl!";
-$decrypted = 'Hello, World!';
+<?php
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Hill Cipher Key Matrix
+    |--------------------------------------------------------------------------
+    |
+    | The key matrix for the Hill cipher encryption. Must be a square matrix
+    | (2x2 or 3x3) and invertible. The matrix should be provided as a JSON string.
+    |
+    */
+    'key' => '[[3,2],[5,7]]', // 2x2 matrix example
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Previous Key Matrix
+    |--------------------------------------------------------------------------
+    |
+    | Used for key rotation. Store your previous key here when updating
+    | the main key to allow re-encryption of existing data.
+    |
+    */
+    'previous_key' => null,
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Models to Re-encrypt
+    |--------------------------------------------------------------------------
+    |
+    | List of model classes that should be processed during key rotation.
+    |
+    */
+    'models' => [
+        // App\Models\User::class,
+        // App\Models\Customer::class,
+    ],
+];
 ```
 
-### 5. Encrypt and decrypt model fields
-You can encrypt and decrypt model fields by using the `EncryptAble` trait in your model class, and specify the fields that you want to encrypt in the `$encryptAble` property.
+### 🔑 Key Matrix Requirements
+
+- **Size**: 2x2 or 3x3 square matrix
+- **Invertible**: Must have a determinant that is coprime with the alphabet size
+- **Format**: JSON string representation of the matrix
+
+**Example valid matrices:**
 ```php
-use Illuminate\Database\Eloquent\Model;
+// 2x2 matrix
+'key' => '[[3,2],[5,7]]'
+
+// 3x3 matrix  
+'key' => '[[6,24,1],[13,16,10],[20,17,15]]'
+```
+
+---
+
+## 📖 Usage
+
+### Basic Usage
+
+Add the `EncryptAble` trait to your Eloquent model and define the `$encryptAble` property:
+
+```php
+<?php
+
+namespace App\Models;
+
 use Hamoi1\EloquentEncryptAble\Traits\EncryptAble;
+use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
     use EncryptAble;
 
-    public $encryptAble = ['name', 'email'];
+    protected $fillable = [
+        'name', 'email', 'phone', 'address'
+    ];
+
+    /**
+     * The attributes that should be encrypted.
+     *
+     * @var array
+     */
+    protected $encryptAble = [
+        'phone', 'address'
+    ];
 }
 ```
-now the `name` and `email` fields will be encrypted and decrypted automatically,
-when you save and retrieve , like the following example:
-```php
-$user = new User();
-$user->name = 'John Doe';
-$user->email = 'john@gmail.com';
-$user->save();
 
+Now your specified attributes will be automatically encrypted when saving and decrypted when retrieving:
+
+```php
+// Create a new user - phone and address will be encrypted automatically
+$user = User::create([
+    'name' => 'John Doe',
+    'email' => 'john@example.com',
+    'phone' => '+1234567890',
+    'address' => '123 Main Street'
+]);
+
+// Retrieve user - phone and address will be decrypted automatically
 $user = User::find(1);
-$user->name; // John Doe
-$user->email; // john@gmail.com
-```
-the `name` and `email` fields will be encrypted in the database, and decrypted when you retrieve them.
-
-### 6. Re-encrypt model data
-You can re-encrypt model data with a new key matrix , but you should specify the previous key matrix in the `.env` file.
-
-```env
-# for 2x2 key matrix
-ELOQUENT_ENCRYPTABLE_KEY= "[[4, 7], [3, 10]]"
-ELOQUENT_ENCRYPTABLE_PREVIOUS_KEY= "[[14, 17], [13, 20]]"
-
-# for 3x3 matrix
-ELOQUENT_ENCRYPTABLE_KEY= "[[1, 11,6], [21, 20,15] ,[2, 20, 9]]"
-ELOQUENT_ENCRYPTABLE_PREVIOUS_KEY= "[[13,5,14],[7,10,1],[4,3,16]]"
+echo $user->phone; // +1234567890 (decrypted)
+echo $user->address; // 123 Main Street (decrypted)
 ```
 
-and added models that you want to re-encrypt in the `config/eloquent-encryptable.php` file:
-```php
-'models' => [
-    User::class,
-    Category::class
-],
-```
-then you can run the following command to re-encrypt model data:
-```bash
-php artisan eloquent-encryptable:re-encrypt
-```
-This command will re-encrypt all model fields that are encrypted with the previous key matrix will be re-encrypted with the new key matrix.
+### Validation Rules
 
-### 7. Custom Validation Rules
+The package provides custom validation rules for encrypted fields:
+
 #### Unique Rule
-You can use the `unique` validation rule with encrypted fields by using the `EncryptAbleUniqueRule` rule.
+
+Ensure encrypted field values are unique:
+
 ```php
 use Hamoi1\EloquentEncryptAble\Rules\EncryptAbleUniqueRule;
 
-$request->validate([
-    'email' => ['required', new EncryptAbleUniqueRule('users', 'email')],
-]);
-```
-and you can add 3rd parameter to expect a specific value:
-```php
-use Hamoi1\EloquentEncryptAble\Rules\EncryptAbleUniqueRule;
-
-$request->validate([
-    'email' => ['required', new EncryptAbleUniqueRule('users', 'email',[
-        'column' => 'id',
-        'value' => $this->user_id
-    ])],
-]);
+public function rules()
+{
+    return [
+        'phone' => [
+            'required',
+            new EncryptAbleUniqueRule('users', 'phone')
+        ],
+        
+        // For updates, exclude current record
+        'email' => [
+            'required',
+            new EncryptAbleUniqueRule('users', 'email', [
+                'column' => 'id',
+                'value' => $this->user->id
+            ])
+        ],
+    ];
+}
 ```
 
 #### Exists Rule
-You can use the `exists` validation rule with encrypted fields by using the `EncryptAbleExistsRule` rule.
-```php
-use Hamoi1\EloquentEncryptAble\Rules\EncryptAbleExistsRule;
 
-$request->validate([
-    'email' => ['required', new EncryptAbleExistsRule('users', 'email')],
-]);
-```
-and you can add 3rd parameter to expect a specific value:
-```php
-use Hamoi1\EloquentEncryptAble\Rules\EncryptAbleExistsRule;
+Validate that encrypted field value exists:
 
-$request->validate([
-    'email' => ['required', new EncryptAbleExistsRule('users', 'email',[
-        'column' => 'id',
-        'value' => $this->user_id
-    ])],
-]);
+```php
+use Hamoi1\EloquentEncryptAble\Rules\EncryptAbleExistRule;
+
+public function rules()
+{
+    return [
+        'parent_phone' => [
+            'required',
+            new EncryptAbleExistRule('users', 'phone')
+        ],
+    ];
+}
 ```
 
-### 8. Blade Directives
-You can use the `@encrypt` and `@decrypt` blade directives to encrypt and decrypt text in your blade views.
+### Blade Directives
+
+Use convenient Blade directives in your views:
+
 ```blade
-@encrypt('Hello, World!')
-@decrypt('Ejrno, Wtenl!')
+{{-- Decrypt a value --}}
+@decrypt($user->phone)
+
+{{-- Decrypt with default value --}}
+@decrypt($user->phone, 'N/A')
+
+{{-- Encrypt a value --}}
+@encrypt('sensitive data')
 ```
 
+**Example in a Blade template:**
+```blade
+<div class="user-info">
+    <p><strong>Name:</strong> {{ $user->name }}</p>
+    <p><strong>Phone:</strong> @decrypt($user->phone, 'Not provided')</p>
+    <p><strong>Address:</strong> @decrypt($user->address)</p>
+</div>
+```
 
-## Security
+### Console Commands
 
-If you discover any security-related issues, please email [ihama9728@gmail.com](mailto:ihama9728@gmail.com) instead of using the issue tracker.
+#### Re-encrypt Data
 
+When rotating encryption keys, use the console command to re-encrypt existing data:
 
-## License
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
+```bash
+php artisan eloquent-encryptable:re-encrypt
+```
+
+This command will:
+1. Load models from the configuration
+2. Decrypt data using the previous key
+3. Re-encrypt using the new key
+4. Show progress bars and timing information
+5. Process data in chunks for memory efficiency
+
+---
+
+## 🔧 Advanced Usage
+
+### Manual Encryption/Decryption
+
+Access the encryption service directly:
+
+```php
+use Hamoi1\EloquentEncryptAble\Services\EloquentEncryptAbleService;
+
+$service = app(EloquentEncryptAbleService::class);
+
+// Encrypt a string
+$encrypted = $service->encrypt('sensitive data');
+
+// Decrypt a string
+$decrypted = $service->decrypt($encrypted);
+
+// Decrypt using previous key (for key rotation)
+$decrypted = $service->decrypt($encrypted, true);
+```
+
+### Batch Operations
+
+Process multiple model attributes:
+
+```php
+$data = [
+    'phone' => '+1234567890',
+    'address' => '123 Main Street',
+    'ssn' => '123-45-6789'
+];
+
+$fields = ['phone', 'address', 'ssn'];
+
+// Encrypt multiple fields
+$encrypted = $service->encryptModelData($data, $fields);
+
+// Decrypt multiple fields
+$decrypted = $service->decryptModelData($encrypted, $fields);
+
+// Re-encrypt with new key
+$reEncrypted = $service->reEncryptModelData($encrypted, $fields);
+```
+
+### Custom Key Matrix Generation
+
+Generate a random invertible key matrix:
+
+```php
+// This will throw an exception with a suggested matrix if current key is invalid
+try {
+    $service = app(EloquentEncryptAbleService::class);
+    $service->encrypt('test');
+} catch (InvalidArgumentException $e) {
+    echo $e->getMessage(); // Contains the suggested matrix
+}
+```
+
+---
+
+## 📚 API Reference
+
+### EncryptAble Trait
+
+| Method | Description |
+|--------|-------------|
+| `bootEncryptAble()` | Automatically encrypts/decrypts model attributes |
+
+### EloquentEncryptAbleService
+
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `encrypt(string $word)` | `$word` - Text to encrypt | Encrypts a string using Hill cipher |
+| `decrypt(string $encrypted, bool $previousKey = false)` | `$encrypted` - Encrypted text<br>`$previousKey` - Use previous key | Decrypts a string |
+| `encryptModelData(array $data, array $fields)` | `$data` - Model data<br>`$fields` - Fields to encrypt | Encrypts specified model fields |
+| `decryptModelData(array $data, array $fields)` | `$data` - Model data<br>`$fields` - Fields to decrypt | Decrypts specified model fields |
+| `reEncryptModelData(array $data, array $fields)` | `$data` - Model data<br>`$fields` - Fields to re-encrypt | Re-encrypts using new key |
+
+### Validation Rules
+
+| Rule | Constructor Parameters | Description |
+|------|----------------------|-------------|
+| `EncryptAbleUniqueRule` | `$table, $column, $except = []` | Validates uniqueness of encrypted field |
+| `EncryptAbleExistRule` | `$table, $column, $except = []` | Validates existence of encrypted field |
+
+---
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+**1. Invalid Key Matrix Error**
+```
+InvalidArgumentException: Invalid Hill cipher key matrix in .env file.
+```
+**Solution:** Ensure your key matrix is:
+- A valid JSON string
+- Square (2x2 or 3x3)
+- Invertible (determinant coprime with alphabet size)
+
+**2. Memory Issues with Large Datasets**
+```
+Fatal error: Allowed memory size exhausted
+```
+**Solution:** The re-encrypt command processes data in chunks of 100. For very large datasets, consider:
+- Increasing PHP memory limit
+- Processing models individually
+- Running during off-peak hours
+
+**3. Character Encoding Issues**
+```
+Encrypted text appears garbled
+```
+**Solution:** Ensure your database columns support UTF-8 encoding:
+```sql
+ALTER TABLE users MODIFY COLUMN address TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### Debug Mode
+
+Enable debug logging by adding to your model:
+
+```php
+protected static function bootEncryptAble()
+{
+    parent::bootEncryptAble();
+    
+    if (config('app.debug')) {
+        \Log::info('Encrypting model: ' . static::class);
+    }
+}
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Follow the development setup below
+4. Make your changes and add tests
+5. Ensure all tests pass and code follows PSR-12 standards
+6. Commit your changes (`git commit -m 'Add amazing feature'`)
+7. Push to the branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
+
+### Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/hamoi1/eloquent-encryptable.git
+   cd eloquent-encryptable
+   ```
+
+2. **Install dependencies**
+   ```bash
+   composer install
+   ```
+
+3. **Set up testing environment**
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+   ```
+
+4. **Create test configuration**
+   Create `config/eloquent-encryptable.php` for testing:
+   ```php
+   <?php
+   return [
+       'key' => '[[3,2],[5,7]]',
+       'previous_key' => '[[2,3],[1,4]]',
+       'models' => [
+           'App\\Models\\TestUser',
+       ],
+   ];
+   ```
+
+### Project Structure
+
+```
+eloquent-encryptable/
+├── src/
+│   ├── Console/
+│   │   └── Commands/
+│   │       └── ReEncryptDataCommand.php
+│   ├── Rules/
+│   │   ├── EncryptAbleExistRule.php
+│   │   └── EncryptAbleUniqueRule.php
+│   ├── Services/
+│   │   └── EloquentEncryptAbleService.php
+│   ├── Traits/
+│   │   └── EncryptAble.php
+│   └── EloquentEncryptAbleServiceProvider.php
+├── config/
+│   └── eloquent-encryptable.php
+├── composer.json
+└── README.md
+```
+
+### Adding New Features
+
+When adding new features:
+
+1. **Create tests first** (TDD approach)
+2. **Follow existing patterns** in the codebase
+3. **Update documentation** in README.md
+4. **Add PHPDoc comments** for all public methods
+5. **Consider backward compatibility**
+---
+
+## 📄 License
+
+This package is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
